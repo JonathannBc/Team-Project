@@ -1,5 +1,5 @@
 import java.util.ArrayList;
-import java.util.Comparator;
+import java.util.Collections;
 import java.util.List;
 import java.util.Scanner;
 
@@ -10,7 +10,7 @@ public class Gradebook {
     private List<Graduate> grads = new ArrayList<>();
 
     //course lists for each student type
-    private static final String[] UNDERGRADUATE_COURSES = {"CS201", "CS202", "CS203", "CS204", "CS205"};
+    private static final String[] UNDERGRADUATE_COURSES = {"CS201", "CS251", "CS371"};
     private static final String[] GRADUATE_COURSES = {"CS450", "CS451", "CS452"};
 
     // Method to add a student to the gradebook
@@ -33,8 +33,15 @@ public class Gradebook {
         List<Courses> courseList = new ArrayList<>();
 
         // Choose course set based on student type
-        String[] selectedCourses = (type == 1) ? UNDERGRADUATE_COURSES : GRADUATE_COURSES;
-
+        String[] selectedCourses;
+        if (type == 1) {
+            selectedCourses = UNDERGRADUATE_COURSES;
+        } else if (type == 2) {
+            selectedCourses = GRADUATE_COURSES;
+        } else {
+            System.out.println("Invalid type selected. Student not added.");
+            return;
+        }
         // Loop through selected courses and input grades
         for (String course : selectedCourses) {
             System.out.print("Enter grade for course " + course + ": ");
@@ -42,15 +49,6 @@ public class Gradebook {
             input.nextLine();
             // Add course with grade to list
             courseList.add(new Courses(course, grade)); 
-        }
-
-        // Each course is worth 4 credits
-        int totalCredits = courseList.size() * 4;
-
-        // Ensure the student meets the minimum credit requirement (15 credits)
-        if (totalCredits < 15) {
-            System.out.println("Student must have at least 15 credits. Not added.");
-            return;
         }
 
         // Add the student to the appropriate list based on type
@@ -62,31 +60,67 @@ public class Gradebook {
             System.out.println("Invalid type.");
         }
     }
-
-    // Method to view student rankings
-    public void viewRankings() {
-        // Sort undergrads by GPA in descending order and display them
-        System.out.println("\n--- Undergraduate Rankings ---");
-        undergrads.sort(Comparator.comparingDouble(Student::getGPA).reversed());
+    public void removeStudent(Scanner input) {
+        System.out.print("Enter student ID to remove: ");
+        int removeId = input.nextInt();
+        input.nextLine(); // Clear newline character
+    
+        boolean found = false;
+    
+        // Try to remove from undergraduates
         for (int i = 0; i < undergrads.size(); i++) {
-            System.out.println("#" + (i + 1)); // Display ranking number
-            undergrads.get(i).display(); // Display student details
+            if (undergrads.get(i).getId() == removeId) {
+                // Remove the student
+                undergrads.remove(i);  
+                System.out.println("Undergraduate student with ID " + removeId + " has been removed.");
+                found = true;
+                break;
+            }
         }
-
-        // Sort grads by GPA in descending order and display them
-        System.out.println("\n--- Graduate Rankings ---");
-        grads.sort(Comparator.comparingDouble(Student::getGPA).reversed());
-        for (int i = 0; i < grads.size(); i++) {
-            System.out.println("#" + (i + 1)); // Display ranking number
-            grads.get(i).display(); // Display student details
+    
+        // If not found in undergraduates, try graduates
+        if (!found) {
+            for (int i = 0; i < grads.size(); i++) {
+                if (grads.get(i).getId() == removeId) {
+                    grads.remove(i);  // Remove the student
+                    System.out.println("Graduate student with ID " + removeId + " has been removed.");
+                    found = true;
+                    break;
+                }
+            }
+        }
+    
+        // If student was not found
+        if (!found) {
+            System.out.println("Student with ID " + removeId + " not found.");
         }
     }
+    
+
+    public void viewRankings() {
+    // Sort undergrads by name alphabetically
+    System.out.println("\n--- Undergraduate Rankings (Alphabetical) ---");
+    // Sort alphabetically by name
+    Collections.sort(undergrads);  
+    for (int i = 0; i < undergrads.size(); i++) {
+        System.out.println("#" + (i + 1));
+        undergrads.get(i).display();  
+    }
+
+    // Sort grads by name alphabetically
+    System.out.println("\n--- Graduate Rankings (Alphabetical) ---");
+    Collections.sort(grads);
+    for (int i = 0; i < grads.size(); i++) {
+        System.out.println("#" + (i + 1));
+        grads.get(i).display();
+    }
+}
 
     // Method to search for a student by their ID
     public void searchStudentById(Scanner input) {
         System.out.print("Enter student ID to search: ");
         int searchId = input.nextInt();
-        input.nextLine(); // Clear newline character
+        input.nextLine(); 
 
         boolean found = false;
 
@@ -94,7 +128,7 @@ public class Gradebook {
         for (Undergrad u : undergrads) {
             if (u.getId() == searchId) {
                 System.out.println("\nStudent found:");
-                u.display(); // Display matching student
+                u.display(); 
                 found = true;
                 break;
             }
@@ -105,7 +139,7 @@ public class Gradebook {
             for (Graduate g : grads) {
                 if (g.getId() == searchId) {
                     System.out.println("\nStudent found:");
-                    g.display(); // Display matching student
+                    g.display(); 
                     found = true;
                     break;
                 }

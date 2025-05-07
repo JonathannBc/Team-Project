@@ -10,14 +10,18 @@ public class GradebookMenu {
             System.out.println("1. Add Student"); 
             System.out.println("2. View Rankings");
             System.out.println("3. Search Student by ID");
-            System.out.println("4. Exit");
+            System.out.println("4. Remove Student"); 
+            System.out.println("5. Exit");
             System.out.print("Please select an option: ");
             
             int choice = scanner.nextInt();
-            scanner.nextLine(); 
+            scanner.nextLine();  
+
             switch (choice) {
                 case 1:
                     manager.addStudent(scanner);
+                    System.out.println("Student added!");  
+
                     break;
                 case 2:
                     manager.viewRankings();
@@ -26,6 +30,11 @@ public class GradebookMenu {
                     manager.searchStudentById(scanner);
                     break;
                 case 4:
+                    manager.removeStudent(scanner);
+                    System.out.println("Student removed!");  
+
+                    break;
+                case 5:
                     System.out.println("Exiting the program. Goodbye!");
                     scanner.close();  
                     return;
